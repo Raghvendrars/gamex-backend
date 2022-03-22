@@ -11,8 +11,8 @@ router.post("/addId", async (req, res) => {
   checkpointDetail.selectedAction = req.body.selectedAction;
   checkpointDetail.effectedPlayerId = req.body.efffectedPlayerId;
   checkpointDetail.selectedEffectedPlayer = req.body.selectedEffectedPlayer;
-  checkpointDetail.MatchId = req.body.MatchId
-  checkpointDetail.MATCHname = req.body.MATCHname
+  checkpointDetail.MatchId = req.body.MatchId;
+  checkpointDetail.MATCHname = req.body.MATCHname;
 
   checkpointDetail.save(function (err) {
     if (err) {
@@ -27,6 +27,69 @@ router.get("/getId", async (req, res) => {
   try {
     const checkpointallDetail = await checkpointModel.find({});
     res.status(200).json(checkpointallDetail);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/getPlayersWithPoints", async (req, res) => {
+  try {
+    res.status(200).json(await getAllPlayerInfoByMatchId(req.query.matchId));
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+const getAllPlayerInfoByMatchId = async (matchId) => {
+  const data = [];
+  const matchData = await checkpointModel.find({
+    MatchId: matchId,
+  });
+  matchData.forEach((value) => {
+    value = value._doc;
+    const index = data.findIndex(
+      (e) => e.selectedPlayer === value.selectedPlayer
+    );
+    if (index === -1) {
+      data.push({
+        selectedPlayer: value.selectedPlayer,
+        cause: [{ actionId: value.actionId, action: value.selectedAction }],
+        points: 2,
+      });
+    } else {
+      data[index] = {
+        selectedPlayer: value.selectedPlayer,
+        cause: [
+          ...data[index].cause,
+          { actionId: value.actionId, action: value.selectedAction },
+        ],
+        points: data[index].points + 2,
+      };
+    }
+  });
+  return data;
+};
+
+router.get("/getPlayerWithHighestAction", async (req, res) => {
+  const selectedActionId = req.query.actionId;
+  try {
+    const data = await getAllPlayerInfoByMatchId(req.query.matchId);
+
+    //new
+    const newData = data
+      .map((playerData, index) => {
+        const instance = playerData.cause.reduce((prev, current) => {
+          if (current.actionId === selectedActionId) {
+            return prev + 1;
+          } else {
+            return prev;
+          }
+        }, 0);
+        return { ...playerData, instance };
+      })
+      .sort((a, b) => b.instance - a.instance);
+
+    res.status(200).json(newData[0]);
   } catch (err) {
     res.status(500).json(err);
   }

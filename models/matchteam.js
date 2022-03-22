@@ -5,9 +5,17 @@ const matchteamSchema = new mongoose.Schema(
     matchName: {
       type: String,
     },
-    teams: {
+    matchDate: {
       type: String,
+      default: new Date().toLocaleDateString()
     },
+    matchTime: {
+      type: String,
+      default: new Date().toLocaleTimeString()
+    }
+    // teams: {
+    //   type: String,
+    // },
   },
   { timestamps: true }
 );
