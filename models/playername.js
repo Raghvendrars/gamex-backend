@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const playerSchema = new mongoose.Schema(
   {
+    matchId: {
+      type: String,
+    },
+    matchName: {
+      type: String,
+    },
     teamId: {
       type: String,
     },

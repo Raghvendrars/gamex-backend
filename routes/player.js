@@ -5,6 +5,8 @@ const playerModel = require("../models/playername");
 router.post("/addPlayer", async (req, res) => {
   var playerDetail = new playerModel();
 
+  playerDetail.matchId = req.body.matchId;
+  playerDetail.matchName = req.body.matchName;
   playerDetail.teamId = req.body.teamId;
   playerDetail.playerName = req.body.playerName;
   playerDetail.playerName = req.body.playerName;
@@ -37,6 +39,16 @@ router.get("/getPlayerByPlayerId/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+router.get("/getPlayersByMatchId", async(req, res) => {
+  try {
+    const matchId = req.query.matchId;
+    const data = await playerModel.find({matchId: matchId})
+    res.status(200).json(data)
+  } catch (err) {
+    res.status(500).json(err);
+  }
+})
 
 router.put("/updatePlayer/:id", async (req, res) => {
   try {

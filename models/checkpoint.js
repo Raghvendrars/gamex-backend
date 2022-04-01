@@ -26,6 +26,9 @@ const checkpointSchema = new mongoose.Schema(
     MATCHname: {
       type: String,
     },
+    teamId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
