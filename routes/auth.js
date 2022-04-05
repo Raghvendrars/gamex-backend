@@ -11,27 +11,28 @@ router.post("/register", async (req, res) => {
     const hashedPass = await bcrypt.hash(req.body.password, salt);
 
     const newUser = new UserModel({
-      username: req.body.username,
+      email: req.body.email,
+      mobile: req.body.mobile,
       password: hashedPass,
     });
 
     const user = await newUser.save();
-    res.status(200).json(`${user.username} Registered Successfully`);
-
+    res.status(200).json(`${user.email} Registered Successfully`);
+    // console.log(res.status(200).json(`${user.email} Registered Successfully`));
   } catch (err) {
-    res.status(500).json("Error Occured !!");
-  }
+  res.status(500).json("Error Occured !!");
+}
 });
 
 //Login
 
 router.post("/login", async (req, res) => {
   try {
-    const user = await UserModel.findOne({ username: req.body.username });
-    !user && res.status(400).json("Wrong Credentials !");
+    const user = await UserModel.findOne({ username: req.body.email });
+    !user && res.status(400).json("Wrong username !");
 
     const validate = await bcrypt.compare(req.body.password, user.password);
-    !validate && res.status(400).json("Wrong Credentials !");
+    !validate && res.status(400).json("Wrong password !");
 
     const { password, ...others } = user._doc;
 

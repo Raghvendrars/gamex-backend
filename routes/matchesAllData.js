@@ -56,6 +56,27 @@ router.delete("/deleteAll", async (req, res) => {
   });
 });
 
+router.get("/getMatchNamePerFive", async (req, res) => {
+  try {
+    let { size, skip } = req.query;
+
+    if (!size) {
+      size = 5;
+    }
+
+
+    if (!skip) {
+      skip = 0;
+    }
+
+    const matches = await matchesModel.find().limit(size).skip(skip);
+
+    res.status(200).json(matches);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 // router.get("/matchTeam", async () => {
 //   matchteamsCollections.aggregate([
 //     {
